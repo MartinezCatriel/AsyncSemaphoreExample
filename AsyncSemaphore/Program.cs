@@ -15,45 +15,52 @@ namespace AsyncSemaphore
             MainAsync().Wait();
         }
 
+        private static SemaphoreImplementation _sempahoreImplementation = new SemaphoreImplementation();
+
         public static async Task MainAsync()
         {
-            await SemaphoreImplementation.DoAsync();
+            await _sempahoreImplementation.DoAsync();
         }
     }
 
-    public static class SemaphoreImplementation
+    public class SemaphoreImplementation
     {
-        public static async Task DoAsync()
+        public async Task DoAsync()
         {
             try
             {
                 using (var semaphoreSlim = new SemaphoreSlim(2, 2))
                 {
                     var stopWatch = Stopwatch.StartNew();
-                    var bucketNeeded = 7;
-                    var list = await ForParallelImplementationList.GetListAsync(bucketNeeded);
-                    Task lastTask = Task.FromResult(true);
+                    var list = await ForParallelImplementationList.GetListAsync();
+                    var taskList = new List<Task>();
                     foreach (var item in list)
                     {
-                        await semaphoreSlim.WaitAsync();
-                        await WriteToConsoleAsync($"Starting task at:{stopWatch.Elapsed}. With {item.DelayTime} delay time.");
-                        lastTask = item.DoAsync(semaphoreSlim);
+                        taskList.Add(ExecuteDoAsync(semaphoreSlim, item, stopWatch));
                     }
-                    await lastTask;
-                    await WriteToConsoleAsync($"Total tasks executed {list.Count()}. Total execution time {stopWatch.Elapsed}");
+                    Task.WaitAll(taskList.ToArray());
+                    Console.WriteLine($"Total tasks executed {list.Count()}. Total execution time {stopWatch.Elapsed}");
                 }
             }
             catch (Exception)
             {
-                await WriteToConsoleAsync("Something went wrong. Try executing the process again.");
+                Console.WriteLine("Something went wrong. Try executing the process again.");
             }
         }
-        private static async Task WriteToConsoleAsync(string toWrite)
+
+        private async Task WriteToConsoleAsync(string toWrite)
         {
             await Task.Run(() =>
             {
                 Console.WriteLine(toWrite);
             });
+        }
+
+        private async Task ExecuteDoAsync(SemaphoreSlim semaphoreSlim, DoSomethingTaskImplementation item, Stopwatch stopWatch)
+        {
+            await semaphoreSlim.WaitAsync();
+            Console.WriteLine($"Starting task at:{stopWatch.Elapsed}. With {item.DelayTime} delay time.");
+            item.DoAsync(semaphoreSlim);
         }
     }
 
@@ -68,11 +75,12 @@ namespace AsyncSemaphore
             new DoSomethingTaskImplementation(){Id=6, DelayTime = 3000 },
             new DoSomethingTaskImplementation(){Id=7, DelayTime = 6000 }
         };
-        public static async Task<IEnumerable<DoSomethingTaskImplementation>> GetListAsync(int bucketNeeded)
+
+        public static async Task<IEnumerable<DoSomethingTaskImplementation>> GetListAsync()
         {
             return await Task.Run(() =>
             {
-                var rtn = _list.Take(bucketNeeded);
+                var rtn = _list;
                 return rtn;
             });
         }
@@ -80,8 +88,10 @@ namespace AsyncSemaphore
 
     public class DoSomethingTaskImplementation
     {
-        public int Id { get; set; }
-        public int DelayTime { get; set; }
+        public int Id { get; internal set; }
+
+        public int DelayTime { get; internal set; }
+
         public async Task<bool> DoAsync(SemaphoreSlim semaphoreSlim)
         {
             try
