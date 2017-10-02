@@ -33,12 +33,14 @@ namespace AsyncSemaphore
                 {
                     var stopWatch = Stopwatch.StartNew();
                     var list = await ForParallelImplementationList.GetListAsync();
-                    var taskList = new List<Task>();
+                    Task lastTask = Task.FromResult(true);
                     foreach (var item in list)
                     {
-                        taskList.Add(ExecuteDoAsync(semaphoreSlim, item, stopWatch));
+                        await semaphoreSlim.WaitAsync();
+                        Console.WriteLine($"Starting task at:{stopWatch.Elapsed}. With {item.DelayTime} delay time.");
+                        lastTask = item.DoAsync(semaphoreSlim);
                     }
-                    Task.WaitAll(taskList.ToArray());
+                    await lastTask;
                     Console.WriteLine($"Total tasks executed {list.Count()}. Total execution time {stopWatch.Elapsed}");
                 }
             }
@@ -54,13 +56,6 @@ namespace AsyncSemaphore
             {
                 Console.WriteLine(toWrite);
             });
-        }
-
-        private async Task ExecuteDoAsync(SemaphoreSlim semaphoreSlim, DoSomethingTaskImplementation item, Stopwatch stopWatch)
-        {
-            await semaphoreSlim.WaitAsync();
-            Console.WriteLine($"Starting task at:{stopWatch.Elapsed}. With {item.DelayTime} delay time.");
-            item.DoAsync(semaphoreSlim);
         }
     }
 
