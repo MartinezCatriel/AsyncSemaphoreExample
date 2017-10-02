@@ -11,3 +11,10 @@ C:\Users\catriel\Downloads\AsyncSemaphore\AsyncSemaphore\obj\Debug\AsyncSemaphor
 C:\Users\catriel\Downloads\AsyncSemaphore\AsyncSemaphore\obj\Debug\AsyncSemaphore.csproj.CoreCompileInputs.cache
 C:\Users\catriel\Downloads\AsyncSemaphore\AsyncSemaphore\obj\Debug\AsyncSemaphore.exe
 C:\Users\catriel\Downloads\AsyncSemaphore\AsyncSemaphore\obj\Debug\AsyncSemaphore.pdb
+C:\Users\catriel\Downloads\AsyncSemaphoreExample\AsyncSemaphore\bin\Debug\AsyncSemaphore.exe.config
+C:\Users\catriel\Downloads\AsyncSemaphoreExample\AsyncSemaphore\bin\Debug\AsyncSemaphore.exe
+C:\Users\catriel\Downloads\AsyncSemaphoreExample\AsyncSemaphore\bin\Debug\AsyncSemaphore.pdb
+C:\Users\catriel\Downloads\AsyncSemaphoreExample\AsyncSemaphore\obj\Debug\AsyncSemaphore.csprojResolveAssemblyReference.cache
+C:\Users\catriel\Downloads\AsyncSemaphoreExample\AsyncSemaphore\obj\Debug\AsyncSemaphore.csproj.CoreCompileInputs.cache
+C:\Users\catriel\Downloads\AsyncSemaphoreExample\AsyncSemaphore\obj\Debug\AsyncSemaphore.exe
+C:\Users\catriel\Downloads\AsyncSemaphoreExample\AsyncSemaphore\obj\Debug\AsyncSemaphore.pdb

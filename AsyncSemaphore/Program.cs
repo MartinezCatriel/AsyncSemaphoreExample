@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace AsyncSemaphore
 {
@@ -16,13 +17,13 @@ namespace AsyncSemaphore
 
         public static async Task MainAsync()
         {
-            await SemaphoreImplementation.Do();
+            await SemaphoreImplementation.DoAsync();
         }
     }
 
     public static class SemaphoreImplementation
     {
-        public static async Task Do()
+        public static async Task DoAsync()
         {
             try
             {
@@ -30,24 +31,24 @@ namespace AsyncSemaphore
                 {
                     var stopWatch = Stopwatch.StartNew();
                     var bucketNeeded = 7;
-                    var list = await ForParallelImplementationList.GetList(bucketNeeded);
+                    var list = await ForParallelImplementationList.GetListAsync(bucketNeeded);
                     Task lastTask = Task.FromResult(true);
                     foreach (var item in list)
                     {
                         await semaphoreSlim.WaitAsync();
-                        await WriteToConsole($"Starting task at:{stopWatch.Elapsed}. With {item.DelayTime} delay time.");
+                        await WriteToConsoleAsync($"Starting task at:{stopWatch.Elapsed}. With {item.DelayTime} delay time.");
                         lastTask = item.DoAsync(semaphoreSlim);
                     }
                     await lastTask;
-                    await WriteToConsole($"Total tasks executed {list.Count()}. Total execution time {stopWatch.Elapsed}");
+                    await WriteToConsoleAsync($"Total tasks executed {list.Count()}. Total execution time {stopWatch.Elapsed}");
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await WriteToConsole("Something went wrong. Try executing the process again.");
+                await WriteToConsoleAsync("Something went wrong. Try executing the process again.");
             }
         }
-        private static async Task WriteToConsole(string toWrite)
+        private static async Task WriteToConsoleAsync(string toWrite)
         {
             await Task.Run(() =>
             {
@@ -67,7 +68,7 @@ namespace AsyncSemaphore
             new DoSomethingTaskImplementation(){Id=6, DelayTime = 3000 },
             new DoSomethingTaskImplementation(){Id=7, DelayTime = 6000 }
         };
-        public static async Task<IEnumerable<DoSomethingTaskImplementation>> GetList(int bucketNeeded)
+        public static async Task<IEnumerable<DoSomethingTaskImplementation>> GetListAsync(int bucketNeeded)
         {
             return await Task.Run(() =>
             {
